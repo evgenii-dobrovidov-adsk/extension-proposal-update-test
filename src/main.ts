@@ -12,6 +12,10 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
   </div>
 `;
 
+function getTimestampFromUrn(urn: string): string | undefined {
+  return urn.split(":").at(-1);
+}
+
 const updateProposalButton = document.querySelector<HTMLButtonElement>(
   "#updateProposalButton",
 )!;
@@ -42,14 +46,24 @@ updateProposalButton.addEventListener("click", async () => {
     return;
   }
 
+  const children = (data.children ?? []).filter(
+    (child) => child.key !== baseKey && child.key !== terrain.key,
+  );
+
+  const revision = getTimestampFromUrn(data.urn);
+  if (!revision) {
+    console.error("Revision not found in proposal URN");
+    return;
+  }
+
   await Forma.proposal.update({
     proposalId,
-    revision: new Date().getTime().toString(),
+    revision,
     proposal: {
       name: `${data.properties?.name ?? "MISSING NAME"} - Updated at ${new Date().toISOString()}`,
       terrain,
       base,
-      children: data.children ?? [],
+      children,
     },
   });
 });
@@ -84,11 +98,15 @@ createProposalButton.addEventListener("click", async () => {
     return;
   }
 
+  const children = (data.children ?? []).filter(
+    (child) => child.key !== baseKey && child.key !== terrain.key,
+  );
+
   const newProposalId = await Forma.proposal.create({
     name: `New Proposal at ${new Date().toISOString()}`,
     terrain,
     base,
-    children: data.children ?? [],
+    children,
   });
   console.log(`New Proposal ID: ${newProposalId}`);
 });
