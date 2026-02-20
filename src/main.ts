@@ -7,6 +7,7 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
     <div class="card">
       <button id="updateProposalButton" type="button">Update Current Proposal</button>
       <button id="createProposalButton" type="button">Create New Proposal</button>
+      <button id="duplicateProposalButton" type="button">Duplicate Current Proposal</button>
       <button id="listProposalsButton" type="button">List Proposals</button>
     </div>
   </div>
@@ -108,6 +109,17 @@ createProposalButton.addEventListener("click", async () => {
     base,
     children,
   });
+  console.log(`New Proposal ID: ${newProposalId}`);
+});
+
+const duplicateProposalButton = document.querySelector<HTMLButtonElement>(
+  "#duplicateProposalButton",
+)!;
+duplicateProposalButton.addEventListener("click", async () => {
+  const proposalId = await Forma.proposal.getId();
+  console.log(`Current Proposal ID: ${proposalId}`);
+
+  const newProposalId = await Forma.proposal.duplicate({ proposalId });
   console.log(`New Proposal ID: ${newProposalId}`);
 });
 
